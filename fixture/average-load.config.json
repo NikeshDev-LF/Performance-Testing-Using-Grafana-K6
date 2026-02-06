@@ -1,0 +1,33 @@
+{
+  "testName": "Average Load Test",
+  "testType": "average_load_test",
+  "stages": [
+    { "duration": "2m", "target": 20 },
+    { "duration": "5m", "target": 20 },
+    { "duration": "2m", "target": 40 },
+    { "duration": "5m", "target": 40 },
+    { "duration": "2m", "target": 0 }
+  ],
+  "thresholds": {
+    "http_req_duration": ["p(95)<500", "p(99)<1000"],
+    "http_req_failed": ["rate<0.05"],
+    "errors": ["rate<0.05"],
+    "api_response_time": ["p(95)<400"],
+    "group_duration{group:::visit product listing page}": ["p(95)<500"],
+    "group_duration{group:::add products to cart}": ["p(95)<400"],
+    "group_duration{group:::view cart}": ["p(95)<300"],
+    "group_duration{group:::checkout process}": ["p(95)<1000"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 500,
+    "addToCartResponseTime": 400,
+    "viewCartResponseTime": 300,
+    "checkoutResponseTime": 1000
+  },
+  "sleepTimes": {
+    "afterAddToCart": "random",
+    "afterIteration": "random"
+  },
+  "reportPath": "reports/average-load/average-load-test-report.html",
+  "jsonReportPath": "reports/average-load/average-load-test-report.json"
+}

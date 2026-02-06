@@ -1,0 +1,10 @@
+# Reports folder - generated test reports
+reports/**/*.html
+reports/**/*.json
+
+# But keep the folder structure
+!reports/.gitkeep
+!reports/smoke/.gitkeep
+!reports/load/.gitkeep
+!reports/stress/.gitkeep
+!reports/custom/.gitkeep

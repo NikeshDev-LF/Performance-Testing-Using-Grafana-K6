@@ -1,0 +1,30 @@
+{
+  "testName": "Stress Test",
+  "testType": "stress_test",
+  "stages": [
+    { "duration": "1m", "target": 20 },
+    { "duration": "2m", "target": 50 },
+    { "duration": "2m", "target": 100 },
+    { "duration": "2m", "target": 150 },
+    { "duration": "2m", "target": 200 },
+    { "duration": "1m", "target": 0 }
+  ],
+  "thresholds": {
+    "http_req_duration": ["p(95)<1000", "p(99)<2000"],
+    "http_req_failed": ["rate<0.2"],
+    "errors": ["rate<0.2"],
+    "group_duration{group:::health check}": ["p(95)<300"],
+    "group_duration{group:::visit product listing page}": ["p(95)<1000"],
+    "group_duration{group:::add products to cart}": ["p(95)<1000"],
+    "group_duration{group:::checkout process}": ["p(95)<2000"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 2000,
+    "checkoutResponseTime": 2000
+  },
+  "sleepTimes": {
+    "afterIteration": 0.5
+  },
+  "reportPath": "reports/stress/stress-test-report.html",
+  "jsonReportPath": "reports/stress/stress-test-report.json"
+}

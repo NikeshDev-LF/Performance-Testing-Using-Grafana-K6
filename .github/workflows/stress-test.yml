@@ -1,0 +1,85 @@
+name: Stress Test
+
+on:
+  push:
+    branches:
+      - stress-test
+  workflow_dispatch:
+  schedule:
+    - cron: '15 18 * * 0' # Run weekly on Monday at 12 AM NPT (GMT+5:45)
+
+jobs:
+  stress-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Docker network
+        run: docker network create k6-test-network
+
+      - name: Build and start application
+        run: |
+          docker build -t sample-app -f - . <<EOF
+          FROM node:22-alpine
+          WORKDIR /app
+          COPY package*.json ./
+          RUN npm ci --only=production
+          COPY . .
+          EXPOSE 3000
+          CMD ["node", "sample-app/server.js"]
+          EOF
+          docker run -d --name app --network k6-test-network -p 3000:3000 sample-app
+
+      - name: Wait for application to be ready
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+
+      - name: Run k6 stress test
+        run: |
+          docker run --rm --network k6-test-network \
+            -v ${{ github.workspace }}/k6:/k6 \
+            grafana/k6:latest run \
+            --out json=/k6/stress-test-results.json \
+            /k6/stress.test.js
+        continue-on-error: true
+        env:
+          K6_BASE_URL: http://app:3000
+
+      - name: Stop and remove containers
+        if: always()
+        run: |
+          docker stop app || true
+          docker rm app || true
+          docker network rm k6-test-network || true
+
+      - name: Setup Node.js for report generation
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies for reporting
+        if: always()
+        run: npm ci
+
+      - name: Generate HTML report
+        if: always()
+        run: node scripts/generate-html-report.js k6/stress-test-results.json k6/stress-test-results.html "Stress Test"
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-test-html-report
+          path: k6/stress-test-results.html
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## 🔥 Stress Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the HTML report artifact to view detailed results." >> $GITHUB_STEP_SUMMARY
+          echo "Some failures are expected during stress testing." >> $GITHUB_STEP_SUMMARY

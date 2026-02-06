@@ -1,0 +1,31 @@
+{
+  "testName": "Breakpoint Test",
+  "testType": "breakpoint_test",
+  "stages": [
+    { "duration": "2m", "target": 20 },
+    { "duration": "2m", "target": 40 },
+    { "duration": "2m", "target": 60 },
+    { "duration": "2m", "target": 80 },
+    { "duration": "2m", "target": 100 },
+    { "duration": "2m", "target": 120 },
+    { "duration": "2m", "target": 140 },
+    { "duration": "2m", "target": 160 },
+    { "duration": "2m", "target": 180 },
+    { "duration": "2m", "target": 200 },
+    { "duration": "2m", "target": 250 },
+    { "duration": "2m", "target": 300 },
+    { "duration": "1m", "target": 0 }
+  ],
+  "thresholds": {
+    "http_req_duration": ["p(95)<5000"],
+    "http_req_failed": ["rate<0.5"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 5000
+  },
+  "sleepTimes": {
+    "afterIteration": 0.5
+  },
+  "reportPath": "reports/breakpoint/breakpoint-test-report.html",
+  "jsonReportPath": "reports/breakpoint/breakpoint-test-report.json"
+}

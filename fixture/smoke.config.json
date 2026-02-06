@@ -1,0 +1,27 @@
+{
+  "testName": "Smoke Test",
+  "testType": "smoke_test",
+  "vus": 1,
+  "duration": "1m",
+  "thresholds": {
+    "http_req_duration": ["p(95)<500"],
+    "http_req_failed": ["rate<0.01"],
+    "errors": ["rate<0.01"],
+    "group_duration{group:::visit product listing page}": ["p(95)<500"],
+    "group_duration{group:::add products to cart}": ["p(95)<400"],
+    "group_duration{group:::view cart}": ["p(95)<300"],
+    "group_duration{group:::checkout process}": ["p(95)<1000"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 500,
+    "addToCartResponseTime": 400,
+    "checkoutResponseTime": 1000
+  },
+  "sleepTimes": {
+    "afterAddToCart": 1,
+    "afterViewCart": 1,
+    "afterIteration": 1
+  },
+  "reportPath": "reports/smoke/smoke-test-report.html",
+  "jsonReportPath": "reports/smoke/smoke-test-report.json"
+}

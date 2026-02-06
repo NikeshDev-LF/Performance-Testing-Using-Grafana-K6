@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Premium Electronics</title>
+  <meta name="description" content="Shop premium electronics and accessories at TechStore">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1>🛍️ TechStore</h1>
+        <div class="cart-icon" id="cartIcon" data-testid="cart-icon">
+          🛒 Cart
+          <span class="cart-count" id="cartCount">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="products-section">
+      <h2 class="section-title">Featured Products</h2>
+      <div class="products-grid" id="productsGrid" data-testid="products-grid">
+        <!-- Products will be loaded here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal" data-testid="cart-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Shopping Cart</h2>
+        <button class="close-btn" id="closeCart" data-testid="close-cart">&times;</button>
+      </div>
+
+      <!-- Cart Items View -->
+      <div id="cartView">
+        <div class="cart-items" id="cartItems" data-testid="cart-items">
+          <!-- Cart items will be loaded here -->
+        </div>
+        <div class="cart-total" id="cartTotal" data-testid="cart-total">
+          <span>Total:</span>
+          <span id="totalAmount">$0.00</span>
+        </div>
+        <button class="btn btn-primary" id="checkoutBtn" data-testid="checkout-btn">
+          Proceed to Checkout
+        </button>
+      </div>
+
+      <!-- Checkout Form -->
+      <div class="checkout-form" id="checkoutForm" data-testid="checkout-form">
+        <form id="customerForm">
+          <div class="form-group">
+            <label for="customerName">Full Name</label>
+            <input type="text" id="customerName" name="name" required data-testid="customer-name">
+          </div>
+          <div class="form-group">
+            <label for="customerEmail">Email</label>
+            <input type="email" id="customerEmail" name="email" required data-testid="customer-email">
+          </div>
+          <div class="form-group">
+            <label for="customerPhone">Phone</label>
+            <input type="tel" id="customerPhone" name="phone" required data-testid="customer-phone">
+          </div>
+          <div class="form-group">
+            <label for="customerAddress">Address</label>
+            <input type="text" id="customerAddress" name="address" required data-testid="customer-address">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="backToCart" data-testid="back-to-cart">
+              Back to Cart
+            </button>
+            <button type="submit" class="btn btn-primary" data-testid="place-order-btn">
+              Place Order
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success Message -->
+      <div class="success-message" id="successMessage" data-testid="success-message">
+        <div class="success-icon">✅</div>
+        <h3>Order Placed Successfully!</h3>
+        <p class="order-id">Order ID: <span id="orderId"></span></p>
+        <button class="btn btn-primary" id="continueShopping" data-testid="continue-shopping">
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+k6/*.html
+k6/*.json
+k6/*.csv
+k6-browser/*.html
+k6-browser/*.json
+k6-browser/*.csv
+screenshots/
+.env
+.env.local
+.vscode/

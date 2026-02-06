@@ -1,0 +1,33 @@
+{
+  "testName": "Load Test",
+  "testType": "load_test",
+  "stages": [
+    { "duration": "30s", "target": 5 },
+    { "duration": "30s", "target": 5 },
+    { "duration": "30s", "target": 10 },
+    { "duration": "30s", "target": 10 },
+    { "duration": "30s", "target": 0 }
+  ],
+  "thresholds": {
+    "http_req_duration": ["p(95)<500", "p(99)<1000"],
+    "http_req_failed": ["rate<0.1"],
+    "errors": ["rate<0.1"],
+    "api_response_time": ["p(95)<400"],
+    "group_duration{group:::visit product listing page}": ["p(95)<500"],
+    "group_duration{group:::add products to cart}": ["p(95)<400"],
+    "group_duration{group:::view cart}": ["p(95)<300"],
+    "group_duration{group:::checkout process}": ["p(95)<1000"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 500,
+    "addToCartResponseTime": 400,
+    "checkoutResponseTime": 1000
+  },
+  "sleepTimes": {
+    "afterAddToCart": 1,
+    "afterViewCart": 2,
+    "afterIteration": 1
+  },
+  "reportPath": "reports/load/load-test-report.html",
+  "jsonReportPath": "reports/load/load-test-report.json"
+}

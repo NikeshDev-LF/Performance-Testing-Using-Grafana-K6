@@ -1,0 +1,29 @@
+{
+  "testName": "Spike Test",
+  "testType": "spike_test",
+  "stages": [
+    { "duration": "30s", "target": 10 },
+    { "duration": "10s", "target": 200 },
+    { "duration": "1m", "target": 200 },
+    { "duration": "10s", "target": 10 },
+    { "duration": "1m", "target": 10 },
+    { "duration": "10s", "target": 0 }
+  ],
+  "thresholds": {
+    "http_req_duration": ["p(95)<2000"],
+    "http_req_failed": ["rate<0.3"],
+    "errors": ["rate<0.3"],
+    "group_duration{group:::visit product listing page}": ["p(95)<2000"],
+    "group_duration{group:::add products to cart}": ["p(95)<2000"],
+    "group_duration{group:::checkout process}": ["p(95)<3000"]
+  },
+  "thresholdLimits": {
+    "productsResponseTime": 2000,
+    "checkoutResponseTime": 3000
+  },
+  "sleepTimes": {
+    "afterIteration": 0.5
+  },
+  "reportPath": "reports/spike/spike-test-report.html",
+  "jsonReportPath": "reports/spike/spike-test-report.json"
+}
