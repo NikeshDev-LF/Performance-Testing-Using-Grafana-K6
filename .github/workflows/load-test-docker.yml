@@ -45,7 +45,7 @@ jobs:
           curl -f http://localhost:3000/api/health || exit 1
 
       - name: Create reports directory
-        run: mkdir -p ${{ github.workspace }}/reports/load
+        run: mkdir -p ${{ github.workspace }}/reports/load && chmod 777 ${{ github.workspace }}/reports/load
 
       - name: Run k6 load test in Docker
         run: |
@@ -53,7 +53,7 @@ jobs:
             --network k6-network \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
-            -e K6_OUT=json=/workspace/reports/load/results.json \
+            --user $(id -u):$(id -g) \
             grafana/k6:latest \
             run k6/load.test.js
         continue-on-error: true
