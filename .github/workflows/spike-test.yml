@@ -40,10 +40,11 @@ jobs:
       - name: Run k6 spike test
         run: |
           docker run --rm --network k6-test-network \
-            -v ${{ github.workspace }}/k6:/k6 \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
             grafana/k6:latest run \
-            --out json=/k6/spike-test-results.json \
-            /k6/spike.test.js
+            --out json=k6/spike-test-results.json \
+            k6/spike.test.js
         continue-on-error: true
         env:
           K6_BASE_URL: http://app:3000
