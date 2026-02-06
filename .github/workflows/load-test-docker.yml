@@ -47,6 +47,11 @@ jobs:
       - name: Create reports directory
         run: mkdir -p ${{ github.workspace }}/reports/load && chmod 777 ${{ github.workspace }}/reports/load
 
+      - name: Update baseUrl for Docker network
+        run: |
+          sed -i 's|http://localhost:3000|http://sample-app:3000|g' fixture/common.config.json
+          cat fixture/common.config.json
+
       - name: Run k6 load test in Docker
         run: |
           docker run --rm \
