@@ -32,6 +32,7 @@ jobs:
           docker run -d \
             --name sample-app \
             --network k6-network \
+            -p 3000:3000 \
             -w /app \
             -v ${{ github.workspace }}:/app \
             node:22-alpine \
@@ -41,7 +42,7 @@ jobs:
         run: |
           echo "Waiting for app to start..."
           sleep 10
-          docker exec sample-app curl -f http://localhost:3000/api/health || exit 1
+          curl -f http://localhost:3000/api/health || exit 1
 
       - name: Create reports directory
         run: mkdir -p ${{ github.workspace }}/reports/load
