@@ -39,18 +39,14 @@ jobs:
           sudo apt-get install k6
 
       - name: Run k6 load test
-        run: k6 run --out json=k6/load-test-results.json k6/load.test.js
-
-      - name: Generate HTML report
-        if: always()
-        run: node scripts/html-report-generator.js k6/load-test-results.json k6/load-test-results.html "Load Test"
+        run: k6 run k6/load.test.js
 
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: load-test-html-report
-          path: k6/load-test-results.html
+          path: reports/load/load-test-report.html
 
       - name: Generate summary
         if: always()

@@ -1,4 +1,4 @@
-import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
+// import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
 
 /**
  * Generates a custom HTML report for K6 tests
@@ -8,7 +8,7 @@ import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
  */
 export function generateHTMLReport(data, reportPath) {
     return {
-        'stdout': textSummary(data, { indent: ' ', enableColors: true }),
+        'stdout': JSON.stringify(data, null, 2), // Simple JSON output instead of textSummary
         [reportPath]: generateCustomHTMLReport(data),
     };
 }
