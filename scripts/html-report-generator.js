@@ -32,6 +32,27 @@ function generateCustomHTMLReport(data) {
         }
     });
 
+    // Recursively collect all checks from all groups
+    function collectChecks(group) {
+        let allChecks = [];
+        
+        // Add checks from current group
+        if (group.checks && group.checks.length > 0) {
+            allChecks = allChecks.concat(group.checks);
+        }
+        
+        // Recursively collect from child groups
+        if (group.groups && group.groups.length > 0) {
+            group.groups.forEach(childGroup => {
+                allChecks = allChecks.concat(collectChecks(childGroup));
+            });
+        }
+        
+        return allChecks;
+    }
+    
+    const allChecks = data.root_group ? collectChecks(data.root_group) : [];
+
     // Extract endpoint-specific metrics with request counts
     const endpointMetrics = [];
     const endpointMap = new Map();
@@ -419,18 +440,18 @@ function generateCustomHTMLReport(data) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.root_group.checks?.map(check => {
+                        ${allChecks.length > 0 ? allChecks.map(check => {
                             const total = check.passes + check.fails;
                             const successRate = total > 0 ? (check.passes / total * 100).toFixed(2) : '0.00';
                             return `
                                 <tr>
-                                    <td>${check.name}</td>
+                                    <td><strong>${check.name}</strong></td>
                                     <td class="pass">${check.passes}</td>
                                     <td class="${check.fails > 0 ? 'fail' : ''}">${check.fails}</td>
-                                    <td>${successRate}%</td>
+                                    <td><strong>${successRate}%</strong></td>
                                 </tr>
                             `;
-                        }).join('') || '<tr><td colspan="4">No checks defined</td></tr>'}
+                        }).join('') : '<tr><td colspan="4">No checks defined</td></tr>'}
                     </tbody>
                 </table>
             </div>

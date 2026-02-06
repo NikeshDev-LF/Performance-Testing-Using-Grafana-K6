@@ -41,8 +41,43 @@ export default function () {
         });
         
         const ok = check(response, {
+            // HTTP Status Validation
             'products loaded': (r) => r.status === 200,
+            'status not 5xx': (r) => r.status < 500,
+            'no timeout error': (r) => r.status !== 0,
+            
+            // Response Time Validation
             'products response acceptable': (r) => r.timings.duration < config.thresholdLimits.productsResponseTime,
+            'response time < 500ms': (r) => r.timings.duration < 500,
+            'response time < 1s': (r) => r.timings.duration < 1000,
+            
+            // JSON & Content Validation
+            'valid JSON response': (r) => {
+                try {
+                    JSON.parse(r.body);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
+            'response not empty': (r) => r.body.length > 0,
+            
+            // Business Logic Validation
+            'products data exists': (r) => JSON.parse(r.body).data !== undefined,
+            'products array not empty': (r) => JSON.parse(r.body).data.length > 0,
+            'each product has id': (r) => JSON.parse(r.body).data.every(p => p.id),
+            'each product has name': (r) => JSON.parse(r.body).data.every(p => p.name),
+            'each product has price': (r) => JSON.parse(r.body).data.every(p => p.price > 0),
+            'each product has stock': (r) => JSON.parse(r.body).data.every(p => p.stock >= 0),
+            
+            // Security Checks
+            'no SQL errors exposed': (r) => !r.body.toLowerCase().includes('sql'),
+            'no stack traces leaked': (r) => !r.body.includes(' at ') && !r.body.includes('Error:'),
+            'no sensitive data in response': (r) => {
+                const body = r.body.toLowerCase();
+                return !body.includes('password') && !body.includes('secret') && !body.includes('apikey');
+            },
         });
 
         if (!ok) {
@@ -75,12 +110,13 @@ export default function () {
 
         const products = JSON.parse(response.body).data;
         const randomProduct = products[Math.floor(Math.random() * products.length)];
+        const requestedQty = 1;
 
         response = http.post(
             `${BASE_URL}/api/cart/${sessionId}`,
             JSON.stringify({
                 productId: randomProduct.id,
-                quantity: 1,
+                quantity: requestedQty,
             }),
             { 
                 headers: { 'Content-Type': 'application/json' },
@@ -89,7 +125,39 @@ export default function () {
         );
 
         const ok = check(response, {
+            // HTTP Status Validation
             'cart operation successful': (r) => r.status === 200,
+            'status not 5xx': (r) => r.status < 500,
+            
+            // Response Time Validation
+            'cart response time OK': (r) => r.timings.duration < config.thresholdLimits.addToCartResponseTime,
+            'add to cart < 500ms': (r) => r.timings.duration < 500,
+            
+            // JSON Validation
+            'valid JSON response': (r) => {
+                try {
+                    JSON.parse(r.body);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
+            
+            // Business Logic - Cart Item Validation
+            'returns cart item data': (r) => r.status === 200 ? JSON.parse(r.body).data !== undefined : true,
+            'cart item has id': (r) => r.status === 200 ? JSON.parse(r.body).data.id !== undefined : true,
+            'correct product id returned': (r) => r.status === 200 ? JSON.parse(r.body).data.productId === randomProduct.id : true,
+            'correct quantity returned': (r) => r.status === 200 ? JSON.parse(r.body).data.quantity === requestedQty : true,
+            
+            // Error Handling
+            'proper error format on failure': (r) => {
+                if (r.status >= 400) {
+                    const body = JSON.parse(r.body);
+                    return body.error !== undefined || body.message !== undefined;
+                }
+                return true;
+            },
         });
 
         if (!ok) {
@@ -110,9 +178,72 @@ export default function () {
         sleep(0.3);
     });
 
-    // Group 3: Checkout (25% of users)
+    // Group 3: View cart
+    group('view cart', function () {
+        const response = http.get(`${BASE_URL}/api/cart/${sessionId}`, {
+            tags: { name: 'GetCart', method: 'GET' },
+        });
+        
+        check(response, {
+            // HTTP Status Validation
+            'cart retrieved': (r) => r.status === 200,
+            'status not 5xx': (r) => r.status < 500,
+            
+            // Response Time Validation
+            'cart retrieval < 500ms': (r) => r.timings.duration < 500,
+            
+            // JSON Validation
+            'valid JSON response': (r) => {
+                try {
+                    JSON.parse(r.body);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
+            
+            // Business Logic - Cart Structure
+            'cart has data property': (r) => JSON.parse(r.body).data !== undefined,
+            'cart has items': (r) => JSON.parse(r.body).data.length > 0,
+            'each item has id': (r) => JSON.parse(r.body).data.every(item => item.id),
+            'each item has productId': (r) => JSON.parse(r.body).data.every(item => item.productId),
+            'each item has quantity': (r) => JSON.parse(r.body).data.every(item => item.quantity > 0),
+            'each item has price': (r) => JSON.parse(r.body).data.every(item => item.price > 0),
+            
+            // Cart Total Calculation Validation
+            'cart total exists': (r) => {
+                const cart = JSON.parse(r.body);
+                return cart.total !== undefined;
+            },
+            'cart total matches items': (r) => {
+                const cart = JSON.parse(r.body);
+                if (!cart.total || !cart.data) return false;
+                const calculatedTotal = cart.data.reduce((sum, item) => 
+                    sum + (item.price * item.quantity), 0);
+                return Math.abs(cart.total - calculatedTotal) < 0.01;
+            },
+        }) || errorRate.add(1);
+
+        apiResponseTime.add(response.timings.duration);
+
+        if (response.status === 200) {
+            successfulRequests.add(1);
+        } else {
+            failedRequests.add(1);
+        }
+
+        sleep(0.2);
+    });
+
+    // Group 4: Checkout (25% of users)
     if (Math.random() > 0.75) {
         group('checkout process', function () {
+            // Get cart total before checkout for validation
+            const cartResponse = http.get(`${BASE_URL}/api/cart/${sessionId}`);
+            const cartTotal = cartResponse.status === 200 ? JSON.parse(cartResponse.body).total : 0;
+            const cartItemCount = cartResponse.status === 200 ? JSON.parse(cartResponse.body).data.length : 0;
+            
             const response = http.post(
                 `${BASE_URL}/api/checkout/${sessionId}`,
                 JSON.stringify({
@@ -130,7 +261,50 @@ export default function () {
             );
 
             const ok = check(response, {
+                // HTTP Status Validation
                 'checkout successful': (r) => r.status === 200,
+                'status not 5xx': (r) => r.status < 500,
+                
+                // Response Time Validation
+                'checkout response time OK': (r) => r.timings.duration < config.thresholdLimits.checkoutResponseTime,
+                'checkout < 1s': (r) => r.timings.duration < 1000,
+                
+                // JSON Validation
+                'valid JSON response': (r) => {
+                    try {
+                        JSON.parse(r.body);
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                },
+                'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
+                
+                // Business Logic - Order Validation
+                'order created': (r) => r.status === 200 ? JSON.parse(r.body).data.id !== undefined : true,
+                'order id is valid': (r) => r.status === 200 ? JSON.parse(r.body).data.id.length > 0 : true,
+                'order has timestamp': (r) => r.status === 200 ? JSON.parse(r.body).data.timestamp !== undefined : true,
+                'order total exists': (r) => r.status === 200 ? JSON.parse(r.body).data.total !== undefined : true,
+                'order total matches cart': (r) => r.status === 200 ? Math.abs(JSON.parse(r.body).data.total - cartTotal) < 0.01 : true,
+                'order has items': (r) => r.status === 200 ? JSON.parse(r.body).data.items !== undefined : true,
+                'order items preserved': (r) => r.status === 200 ? JSON.parse(r.body).data.items.length === cartItemCount : true,
+                'order has customer info': (r) => r.status === 200 ? JSON.parse(r.body).data.customerInfo !== undefined : true,
+                
+                // Error Handling
+                'proper error format on failure': (r) => {
+                    if (r.status >= 400) {
+                        const body = JSON.parse(r.body);
+                        return body.error !== undefined || body.message !== undefined;
+                    }
+                    return true;
+                },
+                'error message is meaningful': (r) => {
+                    if (r.status >= 400) {
+                        const body = JSON.parse(r.body);
+                        return (body.message || body.error || '').length > 0;
+                    }
+                    return true;
+                },
             });
 
             if (!ok) {

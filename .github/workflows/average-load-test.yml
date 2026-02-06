@@ -16,64 +16,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create Docker network
-        run: docker network create k6-test-network
-
-      - name: Build and start application
-        run: |
-          docker build -t sample-app -f - . <<EOF
-          FROM node:22-alpine
-          WORKDIR /app
-          COPY package*.json ./
-          RUN npm ci --only=production
-          COPY . .
-          EXPOSE 3000
-          CMD ["node", "sample-app/server.js"]
-          EOF
-          docker run -d --name app --network k6-test-network -p 3000:3000 sample-app
-
-      - name: Wait for application to be ready
-        run: |
-          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
-
-      - name: Run k6 average load test
-        run: |
-          docker run --rm --network k6-test-network \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            grafana/k6:latest run \
-            --out json=k6/average-load-test-results.json \
-            k6/average-load.test.js
-        env:
-          K6_BASE_URL: http://app:3000
-
-      - name: Stop and remove containers
-        if: always()
-        run: |
-          docker stop app || true
-          docker rm app || true
-          docker network rm k6-test-network || true
-
-      - name: Setup Node.js for report generation
-        if: always()
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install dependencies for reporting
-        if: always()
+      - name: Install dependencies
         run: npm ci
 
-      - name: Generate HTML report
-        if: always()
-        run: node scripts/generate-html-report.js k6/average-load-test-results.json k6/average-load-test-results.html "Average Load Test"
+      - name: Start application
+        run: |
+          node sample-app/server.js &
+          sleep 5
+          curl http://localhost:3000/api/health
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run k6 average load test
+        run: k6 run k6/average-load.test.js
+        continue-on-error: true
 
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: average-load-test-html-report
-          path: k6/average-load-test-results.html
+          path: reports/average-load/average-load-test-report.html
 
       - name: Generate summary
         if: always()

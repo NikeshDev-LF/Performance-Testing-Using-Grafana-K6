@@ -1,0 +1,96 @@
+name: Smoke Test (Docker)
+
+on:
+  push:
+    branches:
+      - smoke-test-docker
+  workflow_dispatch:
+  schedule:
+    - cron: '15 18 * * 0' # Run weekly on Monday at 12 AM NPT (GMT+5:45)
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Docker network
+        run: docker network create k6-network
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start application in Docker
+        run: |
+          docker run -d \
+            --name sample-app \
+            --network k6-network \
+            -p 3000:3000 \
+            -w /app \
+            -v ${{ github.workspace }}:/app \
+            node:22-alpine \
+            sh -c "npm ci && node sample-app/server.js"
+
+      - name: Wait for application to be ready
+        run: |
+          echo "Waiting for app to start..."
+          sleep 10
+          curl -f http://localhost:3000/api/health || exit 1
+
+      - name: Create reports directory
+        run: mkdir -p ${{ github.workspace }}/reports/smoke && chmod 777 ${{ github.workspace }}/reports/smoke
+
+      - name: Update baseUrl for Docker network
+        run: |
+          sed -i 's|http://localhost:3000|http://sample-app:3000|g' fixture/common.config.json
+          cat fixture/common.config.json
+
+      - name: Run k6 smoke test in Docker
+        run: |
+          docker run --rm \
+            --network k6-network \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            --user $(id -u):$(id -g) \
+            grafana/k6:latest \
+            run k6/smoke.test.js
+        continue-on-error: true
+
+      - name: Stop and remove containers
+        if: always()
+        run: |
+          docker stop sample-app || true
+          docker rm sample-app || true
+          docker network rm k6-network || true
+
+      - name: Verify report exists
+        if: always()
+        run: |
+          ls -la reports/smoke/
+          if [ -f "reports/smoke/smoke-test-report.html" ]; then
+            echo "✅ HTML report generated successfully"
+          else
+            echo "⚠️ HTML report not found"
+            exit 1
+          fi
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-html-report
+          path: reports/smoke/smoke-test-report.html
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## 🔍 Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the HTML report artifact to view detailed results." >> $GITHUB_STEP_SUMMARY
