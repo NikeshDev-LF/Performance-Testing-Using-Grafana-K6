@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K6 Performance Test Report - 02/06/2026</title>
+    <title>K6 Performance Test Report - 02/11/2026</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -151,7 +151,7 @@
     <div class="container">
         <div class="header">
             <h1>📊 K6 Performance Test Report</h1>
-            <p>Generated: 02/06/2026, 16:23:52</p>
+            <p>Generated: 02/11/2026, 21:12:31</p>
             <div class="status-badge status-failed">
                 ❌ FAILED
             </div>
@@ -163,15 +163,13 @@
                 <h3>⚠️ Failed Thresholds</h3>
                 <ul>
                     
-                        <li>❌ <strong>http_req_failed</strong>: rate<0.1</li>
-                    
                         <li>❌ <strong>group_duration{group:::add products to cart}</strong>: p(95)<400</li>
                     
-                        <li>❌ <strong>group_duration{group:::view cart}</strong>: p(95)<300</li>
+                        <li>❌ <strong>api_response_time</strong>: p(95)<400</li>
                     
                         <li>❌ <strong>errors</strong>: rate<0.1</li>
                     
-                        <li>❌ <strong>api_response_time</strong>: p(95)<400</li>
+                        <li>❌ <strong>group_duration{group:::view cart}</strong>: p(95)<300</li>
                     
                 </ul>
             </div>
@@ -180,7 +178,7 @@
             <div class="summary-cards">
                 <div class="card">
                     <h3>Test Duration</h3>
-                    <div class="value">152.47<span class="unit">seconds</span></div>
+                    <div class="value">153.17<span class="unit">seconds</span></div>
                 </div>
                 <div class="card">
                     <h3>Total Requests</h3>
@@ -188,19 +186,19 @@
                 </div>
                 <div class="card">
                     <h3>Request Rate</h3>
-                    <div class="value">7.16<span class="unit">req/s</span></div>
+                    <div class="value">7.13<span class="unit">req/s</span></div>
                 </div>
                 <div class="card">
                     <h3>Avg Response Time</h3>
-                    <div class="value">183.92<span class="unit">ms</span></div>
+                    <div class="value">184.44<span class="unit">ms</span></div>
                 </div>
                 <div class="card">
                     <h3>Error Rate</h3>
-                    <div class="value">21.06<span class="unit">%</span></div>
+                    <div class="value">0.00<span class="unit">%</span></div>
                 </div>
                 <div class="card">
                     <h3>Successful Requests</h3>
-                    <div class="value">498</div>
+                    <div class="value">728</div>
                 </div>
             </div>
             
@@ -221,42 +219,42 @@
                     <tbody>
                         
                                     <tr>
-                                        <td><strong>visit product listing page</strong></td>
-                                        <td>218.90 ms</td>
-                                        <td>221.84 ms</td>
-                                        <td>306.14 ms</td>
-                                        <td class="pass">
-                                            ✅ PASS
+                                        <td><strong>add products to cart</strong></td>
+                                        <td>1369.85 ms</td>
+                                        <td>1373.91 ms</td>
+                                        <td>1454.06 ms</td>
+                                        <td class="fail">
+                                            ❌ FAIL
                                         </td>
                                     </tr>
                                 
                                     <tr>
                                         <td><strong>checkout process</strong></td>
-                                        <td>440.43 ms</td>
-                                        <td>443.15 ms</td>
-                                        <td>579.15 ms</td>
+                                        <td>441.95 ms</td>
+                                        <td>443.74 ms</td>
+                                        <td>588.34 ms</td>
                                         <td class="pass">
                                             ✅ PASS
                                         </td>
                                     </tr>
                                 
                                     <tr>
-                                        <td><strong>add products to cart</strong></td>
-                                        <td>1365.64 ms</td>
-                                        <td>1363.29 ms</td>
-                                        <td>1463.01 ms</td>
+                                        <td><strong>view cart</strong></td>
+                                        <td>2085.70 ms</td>
+                                        <td>2089.13 ms</td>
+                                        <td>2108.57 ms</td>
                                         <td class="fail">
                                             ❌ FAIL
                                         </td>
                                     </tr>
                                 
                                     <tr>
-                                        <td><strong>view cart</strong></td>
-                                        <td>2083.50 ms</td>
-                                        <td>2083.99 ms</td>
-                                        <td>2108.16 ms</td>
-                                        <td class="fail">
-                                            ❌ FAIL
+                                        <td><strong>visit product listing page</strong></td>
+                                        <td>212.80 ms</td>
+                                        <td>214.95 ms</td>
+                                        <td>307.77 ms</td>
+                                        <td class="pass">
+                                            ✅ PASS
                                         </td>
                                     </tr>
                                 
@@ -278,18 +276,27 @@
                     <tbody>
                         
                                             <tr>
-                                                <td class="metric-name">group_duration{group:::checkout process}</td>
-                                                <td><code>p(95)<1000</code></td>
-                                                <td><strong>579.15 ms</strong></td>
-                                                <td class="pass">
-                                                    ✅ PASS
+                                                <td class="metric-name">group_duration{group:::add products to cart}</td>
+                                                <td><code>p(95)<400</code></td>
+                                                <td><strong>1454.06 ms</strong></td>
+                                                <td class="fail">
+                                                    ❌ FAIL
+                                                </td>
+                                            </tr>
+                                        
+                                            <tr>
+                                                <td class="metric-name">api_response_time</td>
+                                                <td><code>p(95)<400</code></td>
+                                                <td><strong>465.10</strong></td>
+                                                <td class="fail">
+                                                    ❌ FAIL
                                                 </td>
                                             </tr>
                                         
                                             <tr>
                                                 <td class="metric-name">http_req_duration</td>
                                                 <td><code>p(95)<500</code></td>
-                                                <td><strong>401.68 ms</strong></td>
+                                                <td><strong>426.69 ms</strong></td>
                                                 <td class="pass">
                                                     ✅ PASS
                                                 </td>
@@ -305,33 +312,6 @@
                                             </tr>
                                         
                                             <tr>
-                                                <td class="metric-name">http_req_failed</td>
-                                                <td><code>rate<0.1</code></td>
-                                                <td><strong>21.06%</strong></td>
-                                                <td class="fail">
-                                                    ❌ FAIL
-                                                </td>
-                                            </tr>
-                                        
-                                            <tr>
-                                                <td class="metric-name">group_duration{group:::add products to cart}</td>
-                                                <td><code>p(95)<400</code></td>
-                                                <td><strong>1463.01 ms</strong></td>
-                                                <td class="fail">
-                                                    ❌ FAIL
-                                                </td>
-                                            </tr>
-                                        
-                                            <tr>
-                                                <td class="metric-name">group_duration{group:::view cart}</td>
-                                                <td><code>p(95)<300</code></td>
-                                                <td><strong>2108.16 ms</strong></td>
-                                                <td class="fail">
-                                                    ❌ FAIL
-                                                </td>
-                                            </tr>
-                                        
-                                            <tr>
                                                 <td class="metric-name">errors</td>
                                                 <td><code>rate<0.1</code></td>
                                                 <td><strong>100.00%</strong></td>
@@ -341,18 +321,36 @@
                                             </tr>
                                         
                                             <tr>
-                                                <td class="metric-name">api_response_time</td>
-                                                <td><code>p(95)<400</code></td>
-                                                <td><strong>431.61</strong></td>
+                                                <td class="metric-name">group_duration{group:::checkout process}</td>
+                                                <td><code>p(95)<1000</code></td>
+                                                <td><strong>588.34 ms</strong></td>
+                                                <td class="pass">
+                                                    ✅ PASS
+                                                </td>
+                                            </tr>
+                                        
+                                            <tr>
+                                                <td class="metric-name">group_duration{group:::view cart}</td>
+                                                <td><code>p(95)<300</code></td>
+                                                <td><strong>2108.57 ms</strong></td>
                                                 <td class="fail">
                                                     ❌ FAIL
                                                 </td>
                                             </tr>
                                         
                                             <tr>
+                                                <td class="metric-name">http_req_failed</td>
+                                                <td><code>rate<0.1</code></td>
+                                                <td><strong>0.00%</strong></td>
+                                                <td class="pass">
+                                                    ✅ PASS
+                                                </td>
+                                            </tr>
+                                        
+                                            <tr>
                                                 <td class="metric-name">group_duration{group:::visit product listing page}</td>
                                                 <td><code>p(95)<500</code></td>
-                                                <td><strong>306.14 ms</strong></td>
+                                                <td><strong>307.77 ms</strong></td>
                                                 <td class="pass">
                                                     ✅ PASS
                                                 </td>
@@ -503,9 +501,9 @@
                             
                                 <tr>
                                     <td><strong>product added to cart</strong></td>
-                                    <td class="pass">67</td>
-                                    <td class="fail">115</td>
-                                    <td><strong>36.81%</strong></td>
+                                    <td class="pass">182</td>
+                                    <td class="">0</td>
+                                    <td><strong>100.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -552,23 +550,23 @@
                             
                                 <tr>
                                     <td><strong>cart item has id</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
                                     <td><strong>correct product id returned</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
                                     <td><strong>correct quantity returned</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -622,16 +620,16 @@
                             
                                 <tr>
                                     <td><strong>cart has items</strong></td>
-                                    <td class="pass">67</td>
-                                    <td class="fail">115</td>
-                                    <td><strong>36.81%</strong></td>
+                                    <td class="pass">182</td>
+                                    <td class="">0</td>
+                                    <td><strong>100.00%</strong></td>
                                 </tr>
                             
                                 <tr>
                                     <td><strong>each item has id</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -650,9 +648,9 @@
                             
                                 <tr>
                                     <td><strong>each item has price</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -671,9 +669,9 @@
                             
                                 <tr>
                                     <td><strong>checkout successful</strong></td>
-                                    <td class="pass">67</td>
-                                    <td class="fail">115</td>
-                                    <td><strong>36.81%</strong></td>
+                                    <td class="pass">182</td>
+                                    <td class="">0</td>
+                                    <td><strong>100.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -720,9 +718,9 @@
                             
                                 <tr>
                                     <td><strong>order id is valid</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -741,9 +739,9 @@
                             
                                 <tr>
                                     <td><strong>order total matches cart</strong></td>
-                                    <td class="pass">115</td>
-                                    <td class="fail">67</td>
-                                    <td><strong>63.19%</strong></td>
+                                    <td class="pass">0</td>
+                                    <td class="fail">182</td>
+                                    <td><strong>0.00%</strong></td>
                                 </tr>
                             
                                 <tr>
@@ -787,8 +785,8 @@
         </div>
         
         <div class="footer">
-            <p>Generated by K6 Load Testing Framework | Test completed in 152.47s</p>
-            <p>Report created: 02/06/2026, 16:23:52</p>
+            <p>Generated by K6 Load Testing Framework | Test completed in 153.17s</p>
+            <p>Report created: 02/11/2026, 21:12:31</p>
         </div>
     </div>
 </body>
